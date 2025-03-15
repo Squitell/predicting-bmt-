@@ -66,8 +66,9 @@ def train_models(X_train, y_train, X_val, y_val):
     """
     models = {
         "RandomForest": RandomForestClassifier(random_state=42),
-        "XGBoost": XGBClassifier(use_label_encoder=False, eval_metric="logloss", random_state=42),
-        "LightGBM": LGBMClassifier(random_state=42, min_child_samples=10, verbose=-1)  # Prevents LightGBM warnings
+        # Removed use_label_encoder parameter as it's deprecated.
+        "XGBoost": XGBClassifier(eval_metric="logloss", random_state=42),
+        "LightGBM": LGBMClassifier(random_state=42, min_child_samples=10, verbose=-1)
     }
 
     trained_models = {}
@@ -94,9 +95,9 @@ def train_models(X_train, y_train, X_val, y_val):
 
         print(f"{name} Training Accuracy: {train_acc:.4f}, ROC-AUC: {train_auc:.4f}")
         print(f"{name} Validation Accuracy: {val_acc:.4f}, ROC-AUC: {val_auc:.4f}")
-        print(f"Validation Classification Report:\n{classification_report(y_val, y_val_pred)}")
+        # Pass zero_division=0 to avoid UndefinedMetricWarning.
+        print(f"Validation Classification Report:\n{classification_report(y_val, y_val_pred, zero_division=0)}")
 
-        # Store results
         performance_results[name] = {
             "Train Accuracy": train_acc, "Train ROC-AUC": train_auc,
             "Validation Accuracy": val_acc, "Validation ROC-AUC": val_auc
@@ -105,6 +106,7 @@ def train_models(X_train, y_train, X_val, y_val):
         trained_models[name] = model
 
     return trained_models, performance_results
+
 
 def save_models(models: dict, output_dir: str):
     """
