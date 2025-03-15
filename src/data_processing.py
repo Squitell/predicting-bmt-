@@ -15,39 +15,27 @@ import numpy as np
 import pandas as pd
 from sklearn.preprocessing import LabelEncoder
 
+pd.set_option('future.no_silent_downcasting', True)
 
 def handle_missing_values(df: pd.DataFrame) -> pd.DataFrame:
-    """
-    Handle missing values and replace invalid characters like "?" with NaN.
-    
-    - Numeric columns: Fill with median.
-    - Categorical columns: Fill with the most frequent value.
-    
-    Parameters
-    ----------
-    df : pd.DataFrame
-        The input DataFrame.
-
-    Returns
-    -------
-    pd.DataFrame
-        DataFrame with missing values handled.
-    """
     df = df.copy()
+    # Replace placeholders with NaN and explicitly infer objects.
+    df = df.replace(["?", "unknown", "N/A", ""], np.nan).infer_objects(copy=False)
 
-    # Replace "?" and other placeholders with NaN
-    df.replace(["?", "unknown", "N/A", ""], np.nan, inplace=True)
-
-    # Identify numeric and categorical columns
+    # Identify numeric and categorical columns.
     numeric_cols = df.select_dtypes(include=[np.number]).columns
     categorical_cols = df.select_dtypes(exclude=[np.number]).columns
 
-    # Fill missing values
+    # Fill missing values:
+    # - Numeric columns: fill with the median.
     df[numeric_cols] = df[numeric_cols].fillna(df[numeric_cols].median())
+    # - Categorical columns: fill with the mode.
     for col in categorical_cols:
-        df[col].fillna(df[col].mode()[0], inplace=True)
-
+        df[col] = df[col].fillna(df[col].mode()[0])
     return df
+
+
+
 
 
 def remove_highly_correlated_features(df: pd.DataFrame, threshold: float = 0.9) -> pd.DataFrame:
