@@ -70,12 +70,15 @@ def create_shap_summary_plot(shap_values, X_test, model_name, output_dir):
     Create only the SHAP summary plot, which is more reliable than the bar plot.
     """
     try:
+        # Create an explicit RNG.
+        rng = np.random.default_rng(42)
         plt.figure(figsize=(16, 10))
         shap.summary_plot(
             shap_values, 
             X_test, 
             show=False, 
-            max_display=min(20, X_test.shape[1])
+            max_display=min(20, X_test.shape[1]),
+            rng=rng  # pass the RNG explicitly if supported by your SHAP version
         )
         plt.tight_layout()
         summary_path = os.path.join(output_dir, f"{model_name}_shap_summary.png")
@@ -86,6 +89,7 @@ def create_shap_summary_plot(shap_values, X_test, model_name, output_dir):
     except Exception as e:
         print(f"⚠️ SHAP summary plot failed for {model_name}: {str(e)}")
         return False
+
 
 def create_manual_shap_bar_plot(shap_values, X_test, model_name, output_dir):
     """
