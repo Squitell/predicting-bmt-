@@ -65,10 +65,11 @@ def train_models(X_train, y_train, X_val, y_val):
     Train multiple models and evaluate them on training and validation sets.
     """
     models = {
-        "RandomForest": RandomForestClassifier(random_state=42),
-        "XGBoost": XGBClassifier(use_label_encoder=False, eval_metric="logloss", random_state=42),
-        "LightGBM": LGBMClassifier(random_state=42, min_child_samples=10, verbose=-1)  # Prevents LightGBM warnings
-    }
+    "RandomForest": RandomForestClassifier(random_state=42),
+    "XGBoost": XGBClassifier(eval_metric="logloss", random_state=42),
+    "LightGBM": LGBMClassifier(random_state=42, min_child_samples=10, verbose=-1)
+}
+
 
     trained_models = {}
     performance_results = {}
